@@ -52,7 +52,6 @@ deny View -> Control
 - [Installation](#installation)
 - [Optional Utilities](#optional-utilities)
 - [Documentation](#documentation)
-- [Related Projects](#related-projects)
 - [License](#license)
 
 ---
@@ -243,16 +242,6 @@ The `fastarchitecture.optional` package provides optional, zero-allocation primi
 - **[SPEC.md](SPEC.md)** — Formal EBNF grammar (FCA 1.0) and layer semantics.
 - **[MANIFEST.md](MANIFEST.md)** — Specification and token dictionary for `architecture.fca`.
 - **[VALIDATION.md](VALIDATION.md)** — Reference validator pipeline and CLI guide.
-
----
-
-## Related Projects
-
-FastArchitecture is an architectural standard built for the **FastJava Ecosystem**:
-
-- [**FastKeyboard**](https://github.com/andrestubbe/FastKeyboard) — Ultra-fast native Win32 RawInput keyboard engine for Java with zero GC overhead.
-- [**FastVulkan**](https://github.com/andrestubbe/FastVulkan) — High-performance Vulkan 2D/3D graphics and compute engine for Java.
-- [**FastTerminal**](https://github.com/andrestubbe/FastTerminal) — GPU-accelerated terminal emulator for Java.
 
 ---
 
