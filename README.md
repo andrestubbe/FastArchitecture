@@ -201,7 +201,7 @@ java -jar FastArchitecture.jar init <project-name>
 
 ## Installation
 
-### Maven (via JitPack)
+### Option 1: Maven (via JitPack)
 
 ```xml
 <repositories>
@@ -220,9 +220,26 @@ java -jar FastArchitecture.jar init <project-name>
 </dependencies>
 ```
 
-### Standalone Executable CLI
+### Option 2: Gradle (via JitPack)
 
-Download the latest `FastArchitecture-0.1.0.jar` from [Releases](https://github.com/andrestubbe/FastArchitecture/releases) and place it in your path or project root.
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.andrestubbe:FastArchitecture:0.1.0'
+}
+```
+
+### Option 3: Standalone Executable CLI (Direct Download)
+
+Download the standalone executable JAR from [Releases](https://github.com/andrestubbe/FastArchitecture/releases) and run directly without any external dependencies:
+
+```bash
+# Validate architecture of current project
+java -jar FastArchitecture-0.1.0.jar check .
+```
 
 ---
 
