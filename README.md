@@ -135,8 +135,8 @@ Empirical validation benchmarks measured on a standard developer workstation (Wi
 | Tool | Approach | Dependencies | Execution Time |
 |---|---|---|---|
 | **FastArchitecture** | Static Source Parsing | **0 (Pure Java)** | **~18 ms** (Min: 16.1 ms) |
-| ArchUnit | Bytecode Reflection + JUnit | ~15 external JARs | ~2,450 ms |
-| SonarQube Scanner | Full AST Semantic Graph | Heavy JVM agent | ~18,200 ms |
+| [ArchUnit](https://www.archunit.org/) | Bytecode Reflection + JUnit | ~15 external JARs | ~2,450 ms |
+| [SonarQube Scanner](https://www.sonarsource.com/products/sonarqube/) | Full AST Semantic Graph | Heavy JVM agent | ~18,200 ms |
 
 FastArchitecture completes in ~18 ms (approx. 1 display frame at 60 Hz), making it suitable for continuous execution on every file save or pre-commit hook. The reproducible benchmark harness is located in [`ArchitectureBenchmark.java`](src/test/java/fastarchitecture/benchmark/ArchitectureBenchmark.java).
 
