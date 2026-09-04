@@ -14,11 +14,11 @@
 
 ---
 
-**📐 Ultra-compact 30-token architecture standard and zero-dependency Java validator designed to eliminate cognitive drift and boundary bleed in Human/AI Agent co-engineering.**
+**Ultra-compact 30-token architecture standard and zero-dependency Java validator designed to eliminate cognitive drift and boundary bleed in Human/AI Agent co-engineering.**
 
 ---
 
-## ⚡ Quick Start: The 30-Token Manifest
+## Quick Start: The 30-Token Manifest
 
 Add this exact contract to `architecture.fca` or paste it directly into your AI prompt (`.cursorrules`, [AGENTS.md](AGENTS.md)):
 
@@ -36,8 +36,9 @@ deny View -> Control
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
+- [Quick Start: The 30-Token Manifest](#quick-start-the-30-token-manifest)
 - [Why FastArchitecture?](#why-fastarchitecture)
 - [Architecture Topology](#architecture-topology)
 - [The AI Agent Contract (AGENTS.md)](#the-ai-agent-contract-agentsmd)
@@ -50,7 +51,7 @@ deny View -> Control
 
 ---
 
-## 🎯 Why FastArchitecture?
+## Why FastArchitecture?
 
 In modern AI-assisted engineering and **vibe-coding**, architecture is often the primary point of failure:
 
@@ -62,7 +63,7 @@ In modern AI-assisted engineering and **vibe-coding**, architecture is often the
 
 ---
 
-## 🏛️ Architecture Topology
+## Architecture Topology
 
 Every system following FastArchitecture is partitioned into three strictly segregated layers:
 
@@ -90,7 +91,7 @@ Forbidden:
 
 ---
 
-## 🤖 The AI Agent Contract (`AGENTS.md`)
+## The AI Agent Contract (AGENTS.md)
 
 FastArchitecture natively supports the open [AGENTS.md](https://agents.md) standard. 
 
@@ -102,7 +103,7 @@ By placing an [AGENTS.md](AGENTS.md) file at the root of your project, autonomou
 
 ---
 
-## 📂 Minimal Project Structure
+## Minimal Project Structure
 
 ```text
 MyApp/
@@ -116,7 +117,7 @@ MyApp/
 
 ---
 
-## 🚫 Minimal Violation Example
+## Minimal Violation Example
 
 If an AI agent produces:
 ```java
@@ -140,7 +141,7 @@ The validator immediately flags:
 
 ---
 
-## 🔍 Zero-Dependency Reference Validator
+## Zero-Dependency Reference Validator
 
 FastArchitecture includes a high-performance reference validator implemented in pure Java:
 - **Zero dependencies**: No bytecode analyzers, reflection, or third-party libraries.
@@ -159,7 +160,7 @@ java -jar FastArchitecture.jar init <project-name>
 
 ---
 
-## 📦 Optional Utilities
+## Optional Utilities
 
 The `fastarchitecture.optional` package provides optional, zero-allocation primitives for reactive pipelines (such as CREAM or FastJava pipelines):
 - **`FastState`**: Immutable snapshot state representation.
@@ -169,7 +170,7 @@ The `fastarchitecture.optional` package provides optional, zero-allocation primi
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **[AGENTS.md](AGENTS.md)** — Standard agent instructions and prompt contract.
 - **[SPEC.md](SPEC.md)** — Formal EBNF grammar (FCA 1.0) and layer semantics.
@@ -178,6 +179,6 @@ The `fastarchitecture.optional` package provides optional, zero-allocation primi
 
 ---
 
-## 📜 License
+## License
 
 MIT License — see [LICENSE](LICENSE). Part of the **FastJava Ecosystem**.
