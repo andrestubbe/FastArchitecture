@@ -131,15 +131,15 @@ By placing an [AGENTS.md](AGENTS.md) file at the root of your project, autonomou
 
 ## Performance Benchmarks
 
-Static validation benchmarks executed on a standard developer workstation (AMD Ryzen / Windows 11, scanning 100+ Java classes):
+Empirical validation benchmarks measured on a standard developer workstation (Windows 11, Oracle JDK 21, 8 CPUs, scanning 100 Java classes across 100 iterations via `ArchitectureBenchmark`):
 
 | Tool | Approach | Dependencies | Execution Time |
 |---|---|---|---|
-| **FastArchitecture** | Static Source Parsing | **0 (Pure Java)** | **~12 ms** |
+| **FastArchitecture** | Static Source Parsing | **0 (Pure Java)** | **~18 ms** (Min: 16.1 ms) |
 | ArchUnit | Bytecode Reflection + JUnit | ~15 external JARs | ~2,450 ms |
 | SonarQube Scanner | Full AST Semantic Graph | Heavy JVM agent | ~18,200 ms |
 
-FastArchitecture completes in a single frame (<16 ms), making it suitable for continuous execution on every save or file change.
+FastArchitecture completes in ~18 ms (approx. 1 display frame at 60 Hz), making it suitable for continuous execution on every file save or pre-commit hook. The reproducible benchmark harness is located in [`ArchitectureBenchmark.java`](src/test/java/fastarchitecture/benchmark/ArchitectureBenchmark.java).
 
 ---
 

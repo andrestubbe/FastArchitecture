@@ -1,5 +1,6 @@
 package fastarchitecture;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,19 +36,27 @@ public final class DependencyScanner {
         }
 
         List<ImportStatement> imports = new ArrayList<>();
-        List<String> lines = Files.readAllLines(file);
         int lineNum = 0;
-        for (String raw : lines) {
-            lineNum++;
-            String line = raw.trim();
-            if (line.startsWith("package ")) {
-                pkg = line.substring("package ".length()).replace(";", "").trim();
-            } else if (line.startsWith("import ")) {
-                String imp = line.substring("import ".length()).replace(";", "").trim();
-                if (imp.startsWith("static ")) {
-                    imp = imp.substring("static ".length()).trim();
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            String raw;
+            while ((raw = reader.readLine()) != null) {
+                lineNum++;
+                String line = raw.trim();
+                if (line.isEmpty() || line.startsWith("//") || line.startsWith("/*") || line.startsWith("*")) {
+                    continue;
                 }
-                imports.add(new ImportStatement(lineNum, imp, line));
+                if (line.startsWith("package ")) {
+                    pkg = line.substring("package ".length()).replace(";", "").trim();
+                } else if (line.startsWith("import ")) {
+                    String imp = line.substring("import ".length()).replace(";", "").trim();
+                    if (imp.startsWith("static ")) {
+                        imp = imp.substring("static ".length()).trim();
+                    }
+                    imports.add(new ImportStatement(lineNum, imp, line));
+                } else if (line.contains("class ") || line.contains("interface ") || line.contains("record ") || line.contains("enum ")) {
+                    // Java grammar requires all package and import declarations to precede type declarations
+                    break;
+                }
             }
         }
         return new ParsedSource(file, pkg, simpleName, imports);
