@@ -1,0 +1,9 @@
+architecture FastArchitecture
+Model owns state,data
+Control reads Model
+Control writes Model
+View reads Model
+View owns output
+deny Model -> Control
+deny Model -> View
+deny View -> Control
