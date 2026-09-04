@@ -6,12 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * Scans Java source trees and extracts import statements and class structures without bytecode or reflection.
+ * Scans Java source trees and extracts import statements and inline qualified class usages.
  */
 public final class DependencyScanner {
+
+    private static final Pattern QUALIFIED_TYPE_PATTERN = 
+        Pattern.compile("\\b([a-zA-Z0-9_]+\\.(model|control|controller|view)\\.[a-zA-Z0-9_]+)\\b");
 
     public record ImportStatement(int lineNumber, String target, String rawLine) {}
 
@@ -53,9 +58,13 @@ public final class DependencyScanner {
                         imp = imp.substring("static ".length()).trim();
                     }
                     imports.add(new ImportStatement(lineNum, imp, line));
-                } else if (line.contains("class ") || line.contains("interface ") || line.contains("record ") || line.contains("enum ")) {
-                    // Java grammar requires all package and import declarations to precede type declarations
-                    break;
+                } else {
+                    // Check for inline fully-qualified type references
+                    Matcher matcher = QUALIFIED_TYPE_PATTERN.matcher(line);
+                    while (matcher.find()) {
+                        String matchedType = matcher.group(1);
+                        imports.add(new ImportStatement(lineNum, matchedType, line));
+                    }
                 }
             }
         }
