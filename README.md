@@ -1,42 +1,50 @@
-> [!WARNING]
+﻿> [!WARNING]
 > **🚧 WORK IN PROGRESS (WIP) — Active Standard Development**
 >
 > **FastArchitecture** establishes a standardized, minimal cognitive architecture protocol specifically designed to organize **Human / AI Agent Co-Engineering** and **Vibe-Coding**.
 >
 > AI coding assistants often struggle with multi-thousand-token architectural drift, inventing arbitrary folder patterns, leaking UI state into data models, and drifting into spaghetti code. **FastArchitecture** solves this by reducing architecture to an explicit, ultra-compact 30-token grammar that humans, LLMs, and zero-dependency CI validators understand identically.
 
-# FastArchitecture 0.1.0 [ALPHA-2026-09] — Minimal Cognitive Architecture Standard & Verification for Human + AI Co-Engineering
+# FastArchitecture 0.1.0 — Minimal Cognitive Architecture Standard for Human + AI Co-Engineering
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
-[![Platform](https://img.shields.io/badge/Platform-Cross--Platform-lightgrey.svg)]()
-[![Architecture](https://img.shields.io/badge/Protocol-FCA%201.0-brightgreen.svg)](SPEC.md)
+[![Protocol](https://img.shields.io/badge/Protocol-FCA%201.0-brightgreen.svg)](SPEC.md)
 
 ---
 
-## 🎯 The Core Philosophy: Stop Guessing Architecture
+## 🎯 Why FastArchitecture?
 
-In modern AI-assisted engineering and **vibe-coding**, architecture is often the biggest failure point:
-- **Token Limits:** Asking an LLM to "figure out" your architectural boundaries across 20,000 lines of code consumes vast context windows and invites hallucinations.
-- **Architectural Drift:** Agents invent new helper packages, mutate data models directly inside UI render loops, and create circular dependencies.
-- **Cognitive Overload:** Developers must constantly review agent diffs to check whether structural boundaries were broken.
+In modern AI-assisted engineering and **vibe-coding**, architecture is often the primary point of failure:
+- **Token Limits:** Explaining complex architectures across thousands of tokens invites hallucinations and cognitive drift.
+- **Architectural Bleed:** Agents invent ad-hoc packages, mutate models inside rendering routines, or create circular dependencies.
+- **Review Overhead:** Developers spend excessive time checking if agent diffs violated structural boundaries.
 
-**FastArchitecture** replaces architectural guesswork with a tiny, machine-checkable grammar:
+**FastArchitecture** replaces architectural guesswork with a tiny, machine-verifiable grammar:
 
-```
+```text
 FastArchitecture
-├── Model      (owns state and domain data)
-├── Control    (owns behavior, decisions, mutations)
-└── View       (owns presentation and output)
-```
+     │
+     ├── Model    (state, domain data)
+     ├── Control  (behavior, decisions)
+     └── View     (presentation, output)
 
-Instead of a heavy, rigid runtime framework, FastArchitecture is a **declarative protocol** (`architecture.fca`) that fits into ~30 tokens.
+Allowed:
+  Control -> Model.read
+  Control -> Model.write
+  View    -> Model.read
+
+Forbidden:
+  Model -> Control
+  Model -> View
+  View  -> Control
+```
 
 ---
 
 ## 🤖 The AI Prompt Snippet (30 Tokens)
 
-Feed this exact block to any LLM (Claude, ChatGPT, Gemini, Copilot) or add it to `.cursorrules` / system prompts:
+Paste this exact block into your agent prompt (Claude, Gemini, ChatGPT, Copilot) or `.cursorrules`:
 
 ```text
 architecture FastArchitecture
@@ -50,83 +58,77 @@ deny Model -> View
 deny View -> Control
 ```
 
-With just those lines, any AI agent knows immediately:
-- ✅ May `Control` modify `Model`? **Yes.**
-- ❌ May `View` call `Control`? **Denied.**
-- ❌ May `Model` reference `View`? **Denied.**
-- ❌ May `Control` render pixels? **Denied.**
-
 ---
 
-## 📂 Project Structure: Convention over Configuration
+## 📂 Minimal Project Example
 
 ```text
-MyProject/
-├── architecture.fca
-└── src/main/java/myproject/
-    ├── model/               # Model: Data classes, State snapshots, Diffs
-    │   ├── AppState.java
-    │   └── UserSession.java
-    ├── control/             # Control: Event handlers, Actions, Controllers
-    │   ├── InputController.java
-    │   └── ActionHandler.java
-    └── view/                # View: Windows, Canvas, FastVulkan overlays
-        ├── MainWindow.java
-        └── RenderPass.java
+MyApp/
+ ├── architecture.fca
+ └── src/main/java/myapp/
+     ├── model/     # State snapshots, domain data
+     ├── control/   # Actions, input processors, loop drivers
+     └── view/      # Surfaces, overlays, render passes
+```
+
+### Minimal Violation Example
+
+If an AI agent produces:
+```java
+// File: src/main/java/myapp/view/ZoomOverlay.java
+package myapp.view;
+
+import myapp.control.ZoomController; // ✗ FORBIDDEN
+
+public class ZoomOverlay {
+    private ZoomController controller;
+}
+```
+
+The validator immediately flags:
+```text
+✗ VIOLATION: View -> Control
+  Source: src/main/java/myapp/view/ZoomOverlay.java
+  Import: myapp.control.ZoomController
+  Rule:   'deny View -> Control'
 ```
 
 ---
 
-## 🔍 Zero-Dependency Validator CLI
+## 🔍 Reference Validator (Java)
 
-FastArchitecture includes a standalone, lightning-fast static import scanner in pure Java (zero external libraries):
+FastArchitecture includes a zero-dependency reference validator:
+- **Zero dependencies**: No bytecode analyzers, reflection, or external libraries.
+- **Sub-20ms execution**: Instantaneous check in commit hooks or agent loops.
 
 ```bash
-# Check compliance of current project
-java -jar FastArchitecture.jar check .
+# Validate architecture of a project
+java -jar FastArchitecture.jar check <project-directory>
 
-# Initialize a new compliant skeleton
-java -jar FastArchitecture.jar init MyApp
-```
-
-### CLI Output Example
-
-```text
-FastArchitecture Scanner v0.1.0
-Scanning: C:\MyProject
-Rules: architecture.fca
-
-[Topology]
-MyProject
-├── Model   (4 classes)
-├── Control (3 classes)
-└── View    (2 classes)
-
-✓ Model isolated (no outgoing dependencies to Control or View)
-✓ Control verified (valid dependencies to Model)
-✓ View verified (read-only dependencies to Model)
-✓ Forbidden cross-layer calls (0 detected)
-
-Result: ARCHITECTURE VALID
+# Scaffold a compliant project skeleton
+java -jar FastArchitecture.jar init <project-name>
 ```
 
 ---
 
-## 📦 Optional Primitives
+## 📦 Optional Utilities
 
-For reactive / diff-driven architectures (like CREAM or FastJava pipelines), FastArchitecture provides two optional, zero-allocation primitives in `fastarchitecture.optional`:
+The `fastarchitecture.optional` package provides optional, zero-allocation primitives for reactive pipelines (such as CREAM or FastJava pipelines):
 - **`FastState`**: Immutable snapshot state representation.
-- **`FastDelta`**: Differential patch applied to transition from state $S_t$ to $S_{t+1}$.
+- **`FastDelta`**: Differential patch applied to transition state $S_t \to S_{t+1}$.
+
+> *Note: These primitives are optional utilities and are not required to adopt the FastArchitecture standard.*
 
 ---
 
 ## 📚 Documentation
 
-- **[SPEC.md](SPEC.md)** — Full specification of the FCA grammar and verification rules.
-- **[architecture.fca](architecture.fca)** — Standard manifest template.
+- **[SPEC.md](SPEC.md)** — Formal EBNF grammar (FCA 1.0) and layer semantics.
+- **[MANIFEST.md](MANIFEST.md)** — Specification and token dictionary for `architecture.fca`.
+- **[VALIDATION.md](VALIDATION.md)** — Reference validator pipeline and CLI guide.
 
 ---
 
 ## 📜 License
 
-MIT License — see [LICENSE](LICENSE) for details. Part of the FastJava Ecosystem.
+MIT License — see [LICENSE](LICENSE).
