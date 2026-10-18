@@ -4,8 +4,8 @@ Instructions and architectural boundaries for AI coding agents working on FastAr
 
 ## Commands
 - **Build**: `mvn clean package`
-- **Verify Architecture**: `java -jar target/FastArchitecture-0.1.0.jar check .`
-- **Test Example**: `java -jar target/FastArchitecture-0.1.0.jar check examples/ScreenZoomDemo`
+- **Verify Architecture**: `java -jar target/FastArchitecture-0.1.1.jar check .`
+- **Test Example**: `java -jar target/FastArchitecture-0.1.1.jar check examples/ScreenZoomDemo`
 
 ## Architecture Manifest (30 Tokens)
 All code contributions must strictly conform to `architecture.fca`:

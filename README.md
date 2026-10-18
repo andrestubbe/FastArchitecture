@@ -1,17 +1,17 @@
+# FastArchitecture 0.1.1 [ALPHA-2026-10-18] — Minimal Cognitive Architecture Standard & Validator for Human + AI Co-Engineering
+
+[![Status](https://img.shields.io/badge/status-0.1.1-brightgreen.svg)](https://github.com/andrestubbe/FastArchitecture/releases/tag/0.1.1)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010+%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
+[![JitPack](https://img.shields.io/badge/JitPack-0.1.1-green.svg)](https://jitpack.io/#andrestubbe/FastArchitecture)
+
 > [!WARNING]
 > **🚧 WORK IN PROGRESS (WIP) — Active Standard Development**
 >
 > **FastArchitecture** establishes a standardized, minimal cognitive architecture protocol specifically designed to organize **Human / AI Agent Co-Engineering** and **Vibe-Coding**.
 >
 > AI coding assistants often struggle with multi-thousand-token architectural drift, inventing arbitrary folder patterns, leaking UI state into data models, and drifting into spaghetti code. **FastArchitecture** solves this by reducing architecture to an explicit, ultra-compact 30-token grammar that humans, LLMs, and zero-dependency CI validators understand identically.
-
-# FastArchitecture 0.1.0 — Minimal Cognitive Architecture Standard & Validator for Human + AI Co-Engineering
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.java.com)
-[![Protocol](https://img.shields.io/badge/Protocol-FCA%201.0-brightgreen.svg)](SPEC.md)
-[![Agents](https://img.shields.io/badge/Agents-AGENTS.md-blueviolet.svg)](AGENTS.md)
-[![JitPack](https://img.shields.io/badge/JitPack-ready-green.svg)](https://jitpack.io/#andrestubbe/FastArchitecture)
 
 ---
 
@@ -203,7 +203,7 @@ java -jar FastArchitecture.jar init <project-name>
     <dependency>
         <groupId>com.github.andrestubbe</groupId>
         <artifactId>FastArchitecture</artifactId>
-        <version>0.1.0</version>
+        <version>0.1.1</version>
     </dependency>
 </dependencies>
 ```
@@ -216,7 +216,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.andrestubbe:FastArchitecture:0.1.0'
+    implementation 'com.github.andrestubbe:FastArchitecture:0.1.1'
 }
 ```
 
@@ -226,7 +226,7 @@ Download the standalone executable JAR from [Releases](https://github.com/andres
 
 ```bash
 # Validate architecture of current project
-java -jar FastArchitecture-0.1.0.jar check .
+java -jar FastArchitecture-0.1.1.jar check .
 ```
 
 ---
@@ -247,6 +247,7 @@ The `fastarchitecture.optional` package provides optional, zero-allocation primi
 - **[SPEC.md](SPEC.md)** — Formal EBNF grammar (FCA 1.0) and layer semantics.
 - **[MANIFEST.md](MANIFEST.md)** — Specification and token dictionary for `architecture.fca`.
 - **[VALIDATION.md](VALIDATION.md)** — Reference validator pipeline and CLI guide.
+- **[CHANGELOG.md](docs/CHANGELOG.md)** — Version history and release notes.
 
 ---
 
