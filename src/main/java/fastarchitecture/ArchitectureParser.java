@@ -37,21 +37,28 @@ public final class ArchitectureParser {
                 String statement = line.substring("deny ".length()).trim();
                 String[] parts = statement.split("->");
                 if (parts.length == 2) {
-                    Layer from = Layer.fromString(parts[0].trim());
-                    Layer to = Layer.fromString(parts[1].trim());
-                    if (from != Layer.UNKNOWN && to != Layer.UNKNOWN) {
-                        rules.add(ArchitectureRule.deny(from, to));
+                    ArchitectureRule rule = parseRule(parts[0].trim(), parts[1].trim(), false);
+                    if (rule != null) {
+                        rules.add(rule);
                     }
                 }
             } else if (line.startsWith("allow ")) {
                 String statement = line.substring("allow ".length()).trim();
                 String[] parts = statement.split("->");
                 if (parts.length == 2) {
-                    Layer from = Layer.fromString(parts[0].trim());
-                    Layer to = Layer.fromString(parts[1].trim());
-                    if (from != Layer.UNKNOWN && to != Layer.UNKNOWN) {
-                        rules.add(ArchitectureRule.allow(from, to));
+                    ArchitectureRule rule = parseRule(parts[0].trim(), parts[1].trim(), true);
+                    if (rule != null) {
+                        rules.add(rule);
                     }
+                }
+            } else if (line.startsWith("isolate ")) {
+                String statement = line.substring("isolate ".length()).trim();
+                String[] parts = statement.split("(?i)\\s+from\\s+");
+                if (parts.length == 2) {
+                    ArchitectureRule rule1 = parseRule(parts[0].trim(), parts[1].trim(), false);
+                    ArchitectureRule rule2 = parseRule(parts[1].trim(), parts[0].trim(), false);
+                    if (rule1 != null) rules.add(rule1);
+                    if (rule2 != null) rules.add(rule2);
                 }
             }
         }
@@ -61,4 +68,37 @@ public final class ArchitectureParser {
         }
         return new ArchitectureManifest(archName, rules);
     }
+
+    private static ArchitectureRule parseRule(String fromToken, String toToken, boolean allowed) {
+        LayerAndSlice from = parseToken(fromToken);
+        LayerAndSlice to = parseToken(toToken);
+
+        if (from == null || to == null) return null;
+        return new ArchitectureRule(from.layer, from.slice, to.layer, to.slice, allowed);
+    }
+
+    private static LayerAndSlice parseToken(String token) {
+        if (token == null || token.isBlank()) return null;
+        token = token.trim();
+
+        if (token.equals("*")) {
+            return new LayerAndSlice(null, null);
+        }
+
+        if (token.contains(".")) {
+            String[] parts = token.split("\\.", 2);
+            Layer layer = parts[0].equals("*") ? null : Layer.fromString(parts[0]);
+            String slice = parts[1].equals("*") ? null : parts[1].toLowerCase();
+            return new LayerAndSlice(layer, slice);
+        }
+
+        Layer layer = Layer.fromString(token);
+        if (layer != Layer.UNKNOWN) {
+            return new LayerAndSlice(layer, null);
+        }
+        // If not a known layer, treat as slice (e.g. "cli")
+        return new LayerAndSlice(null, token.toLowerCase());
+    }
+
+    private record LayerAndSlice(Layer layer, String slice) {}
 }

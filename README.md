@@ -79,66 +79,45 @@ In modern AI-assisted engineering and **vibe-coding**, architecture is often the
 
 ---
 
-## Architecture Topology
+## Architecture Topology & Slices
 
-Every system following FastArchitecture is partitioned into three strictly segregated layers:
+Every system following FastArchitecture is partitioned into three strictly segregated vertical layers, which can be cleanly sub-divided into horizontal feature slices:
 
 ```text
 FastArchitecture
      │
-     ├── Model    (state, domain data)
-     ├── Control  (behavior, decisions)
-     └── View     (presentation, output)
+     ├── Model    (state, domain data, service backends)
+     │    ├── tts/
+     │    ├── daemon/
+     │    └── settings/
+     │
+     ├── Control  (behavior, user inputs, orchestration)
+     │    ├── cli/
+     │    └── gui/
+     │
+     └── View     (presentation, rendering, user feedback)
+          ├── cli/
+          └── gui/
 
 Allowed:
-  Control -> Model.read
-  Control -> Model.write
-  View    -> Model.read
+  Control.* -> Model.*.read
+  Control.* -> Model.*.write
+  View.*    -> Model.*.read
 
 Forbidden:
-  Model -> Control
-  Model -> View
-  View  -> Control
+  Model.*   -> Control.*
+  Model.*   -> View.*
+  View.*    -> Control.*
+  *.cli     -> *.gui   (Feature Slice Isolation)
 ```
 
 1. **Model Isolation**: `Model` owns state snapshots and domain data. It must never import or reference `Control` or `View`.
 2. **View Read-Only**: `View` reads `Model` state to produce output. It must never import `Control` or mutate `Model`.
 3. **Control Orchestration**: `Control` captures input and state changes, modifies `Model`, but never performs rendering.
-
----
-
-## The AI Agent Contract (AGENTS.md)
-
-FastArchitecture natively supports the open [AGENTS.md](https://agents.md) standard. 
-
-By placing an [AGENTS.md](AGENTS.md) file at the root of your project, autonomous coding agents (Codex, Cursor, Jules, Claude Code) automatically discover:
-- The exact build and test commands (`mvn clean package`).
-- The static verification command (`java -jar FastArchitecture.jar check .`).
-- The 30-token architecture rules.
-- Micro-level code discipline: pair FastArchitecture's macro boundaries with the [Ponytail](https://github.com/DietrichGebert/ponytail) / YAGNI principle to prevent over-engineering.
-
----
-
-## Real-World Use Cases
-
-- **Autonomous AI & Vibe-Coding Sessions**: Give LLMs (Claude Code, Cursor, Codex) an indisputable set of boundaries. The validator catches illegal cross-layer imports before PRs are created.
-- **High-Performance Engines ([FastVulkan](https://github.com/andrestubbe/FastVulkan))**: Ensure GPU render passes and Vulkan pipeline descriptors (`View`) never mutate simulation logic or event loops (`Control`).
-- **Low-Latency Input Systems ([FastKeyboard](https://github.com/andrestubbe/FastKeyboard))**: Guarantee that hardware scancode interceptors feed strictly into `Control` and update `Model` state without direct UI couplings.
-- **CI/CD Quality Gates**: Enforce zero architectural decay on every git commit in under 20 milliseconds without spinning up heavyweight test containers.
-
----
-
-## Performance Benchmarks
-
-Empirical validation benchmarks measured on a standard developer workstation (Windows 11, Oracle JDK 21, 8 CPUs, scanning 100 Java classes across 100 iterations via `ArchitectureBenchmark`):
-
-| Tool | Approach | Dependencies | Execution Time |
-|---|---|---|---|
-| **FastArchitecture** | Static Source Parsing | **0 (Pure Java)** | **~18 ms** (Min: 16.1 ms) |
-| [ArchUnit](https://www.archunit.org/) | Bytecode Reflection + JUnit | ~15 external JARs | ~2,450 ms |
-| [SonarQube Scanner](https://www.sonarsource.com/products/sonarqube/) | Full AST Semantic Graph | Heavy JVM agent | ~18,200 ms |
-
-FastArchitecture completes in ~18 ms (approx. 1 display frame at 60 Hz), making it suitable for continuous execution on every file save or pre-commit hook. The reproducible benchmark harness is located in [`ArchitectureBenchmark.java`](src/test/java/fastarchitecture/benchmark/ArchitectureBenchmark.java).
+4. **Horizontal Slice Isolation (`isolate`)**: Independent interface channels (e.g., `view.cli` vs `view.gui`, or `control.cli` vs `control.gui`) remain completely decoupled. Cross-imports between orthogonal slices are denied automatically via:
+   ```text
+   isolate *.cli from *.gui
+   ```
 
 ---
 
@@ -149,9 +128,15 @@ MyApp/
  ├── architecture.fca
  ├── AGENTS.md
  └── src/main/java/myapp/
-     ├── model/     # State snapshots, domain records
-     ├── control/   # Actions, input processors, loop drivers
-     └── view/      # Surfaces, overlays, render passes
+     ├── model/
+     │    ├── core/     # Pure domain models & immutable records
+     │    └── service/  # Background services
+     ├── control/
+     │    ├── cli/      # CLI command dispatchers & parsers
+     │    └── gui/      # GUI actions & window controllers
+     └── view/
+          ├── cli/      # Terminal rendering & ANSI tables
+          └── gui/      # Window views, dialogs & widgets
 ```
 
 ---

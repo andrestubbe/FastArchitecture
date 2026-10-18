@@ -25,7 +25,8 @@ public final class ArchitectureValidator {
         // 1. Discover all Java source files (excluding build directories)
         List<Path> javaFiles = dependencyScanner.discoverSourceFiles(root);
 
-        // 2. Pass 1: Register all classes and resolve their Architectural Layer
+        // 2. Pass 1: Register all classes and resolve their Architectural Scope (Layer + Slice)
+        Map<String, ArchitectureScope> classToScope = new HashMap<>();
         Map<String, Layer> classToLayer = new HashMap<>();
         Map<Layer, List<String>> classesByLayer = new EnumMap<>(Layer.class);
         for (Layer l : Layer.values()) {
@@ -38,11 +39,14 @@ public final class ArchitectureValidator {
             DependencyScanner.ParsedSource parsed = dependencyScanner.parseSource(file);
             parsedFiles.put(file, parsed);
 
-            Layer layer = layerResolver.resolveSourceLayer(file, parsed.packageName());
+            ArchitectureScope scope = layerResolver.resolveSourceScope(file, parsed.packageName());
+            Layer layer = scope.layer();
             if (layer != Layer.UNKNOWN && parsed.className() != null) {
                 String fullClassName = parsed.packageName().isEmpty() ? parsed.className() : parsed.packageName() + "." + parsed.className();
                 classToLayer.put(fullClassName, layer);
                 classToLayer.put(parsed.className(), layer); // Also map simple name for same-package resolution
+                classToScope.put(fullClassName, scope);
+                classToScope.put(parsed.className(), scope);
                 classesByLayer.get(layer).add(fullClassName);
             }
         }
@@ -53,16 +57,19 @@ public final class ArchitectureValidator {
         for (Map.Entry<Path, DependencyScanner.ParsedSource> entry : parsedFiles.entrySet()) {
             Path file = entry.getKey();
             DependencyScanner.ParsedSource parsed = entry.getValue();
-            Layer sourceLayer = layerResolver.resolveSourceLayer(file, parsed.packageName());
+            ArchitectureScope sourceScope = layerResolver.resolveSourceScope(file, parsed.packageName());
+            Layer sourceLayer = sourceScope.layer();
 
             if (sourceLayer == Layer.UNKNOWN) {
                 continue;
             }
 
             for (DependencyScanner.ImportStatement imp : parsed.imports()) {
-                Layer targetLayer = layerResolver.resolveTargetLayer(imp.target(), classToLayer);
-                if (targetLayer != Layer.UNKNOWN && targetLayer != sourceLayer) {
-                    ArchitectureRule rule = findViolatedRule(sourceLayer, targetLayer);
+                ArchitectureScope targetScope = layerResolver.resolveTargetScope(imp.target(), classToScope);
+                Layer targetLayer = targetScope.layer();
+
+                if (targetLayer != Layer.UNKNOWN) {
+                    ArchitectureRule rule = findViolatedRule(sourceScope, targetScope);
                     if (rule != null) {
                         violations.add(new ArchitectureViolation(
                                 file,
@@ -72,7 +79,9 @@ public final class ArchitectureValidator {
                                 imp.target(),
                                 targetLayer,
                                 rule,
-                                imp.rawLine()
+                                imp.rawLine(),
+                                sourceScope,
+                                targetScope
                         ));
                     }
                 }
@@ -82,9 +91,9 @@ public final class ArchitectureValidator {
         return new ArchitectureReport(root, manifest, classesByLayer, violations);
     }
 
-    private ArchitectureRule findViolatedRule(Layer from, Layer to) {
+    private ArchitectureRule findViolatedRule(ArchitectureScope source, ArchitectureScope target) {
         for (ArchitectureRule r : manifest.getRules()) {
-            if (r.from() == from && r.to() == to && !r.allowed()) {
+            if (r.matches(source, target) && !r.allowed()) {
                 return r;
             }
         }

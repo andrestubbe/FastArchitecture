@@ -129,6 +129,53 @@ public class ArchitectureValidatorTest {
         assertEquals(3, manifest.getRules().size());
     }
 
+    @Test
+    public void testSliceIsolationViolationDetected(@TempDir Path tempDir) throws IOException {
+        Path cliDir = tempDir.resolve("src/app/view/cli");
+        Path guiDir = tempDir.resolve("src/app/view/gui");
+        Files.createDirectories(cliDir);
+        Files.createDirectories(guiDir);
+
+        Files.writeString(guiDir.resolve("GuiView.java"), "package app.view.gui;\npublic class GuiView {}");
+        Files.writeString(cliDir.resolve("CliView.java"), "package app.view.cli;\nimport app.view.gui.GuiView;\npublic class CliView { GuiView g; }");
+
+        String fca = """
+                architecture FastArchitecture
+                isolate *.cli from *.gui
+                """;
+        Files.writeString(tempDir.resolve("architecture.fca"), fca);
+
+        ArchitectureReport report = FastArchitecture.validate(tempDir);
+        assertFalse(report.isValid(), "Cli slice importing Gui slice must violate isolate rule");
+        assertEquals(1, report.getViolations().size());
+        ArchitectureViolation v = report.getViolations().get(0);
+        assertEquals("cli", v.sourceScope().slice());
+        assertEquals("gui", v.targetScope().slice());
+    }
+
+    @Test
+    public void testAllowedSliceDependenciesPass(@TempDir Path tempDir) throws IOException {
+        Path cliDir = tempDir.resolve("src/app/control/cli");
+        Path ttsDir = tempDir.resolve("src/app/model/tts");
+        Files.createDirectories(cliDir);
+        Files.createDirectories(ttsDir);
+
+        Files.writeString(ttsDir.resolve("Voice.java"), "package app.model.tts;\npublic class Voice {}");
+        Files.writeString(cliDir.resolve("CliController.java"), "package app.control.cli;\nimport app.model.tts.Voice;\npublic class CliController { Voice v; }");
+
+        String fca = """
+                architecture FastArchitecture
+                deny Model -> Control
+                deny View -> Control
+                isolate *.cli from *.gui
+                """;
+        Files.writeString(tempDir.resolve("architecture.fca"), fca);
+
+        ArchitectureReport report = FastArchitecture.validate(tempDir);
+        assertTrue(report.isValid(), "Control.cli importing Model.tts must be allowed under default rules");
+        assertEquals(0, report.getViolations().size());
+    }
+
     private void setupProject(Path root, String modelSrc, String controlSrc, String viewSrc) throws IOException {
         Path modelDir = root.resolve("src/app/model");
         Path controlDir = root.resolve("src/app/control");
