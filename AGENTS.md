@@ -21,6 +21,13 @@ deny Model -> View
 deny View -> Control
 ```
 
+## Generic Topology & Slices
+FastArchitecture prescribes a **generic 3-tier reference architecture** applicable to any domain:
+- **`Model`**: Pure state, domain entities, and data service providers (e.g. `model.core`, `model.service`).
+- **`Control`**: Orchestration, interaction dispatchers, and state mutations (e.g. `control.cli`, `control.gui`).
+- **`View`**: Output presentation, terminal rendering, widgets (e.g. `view.cli`, `view.gui`).
+- **Feature Slice Isolation**: Orthogonal interfaces remain decoupled via rule `isolate *.cli from *.gui`. Never import across slice boundaries.
+
 ## Constraints and Code Style
 - **Zero Dependencies**: Do not add external runtime libraries to `pom.xml`.
 - **Pure Java 17+**: Use modern standard library features (records, pattern matching).

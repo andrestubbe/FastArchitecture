@@ -81,23 +81,26 @@ In modern AI-assisted engineering and **vibe-coding**, architecture is often the
 
 ## Architecture Topology & Slices
 
+> [!IMPORTANT]
+> **Generic Reference Topology**: The sub-packages (`core`, `service`, `cli`, `gui`) below illustrate a **generic reference topology**. FastArchitecture maps to any domain: the three vertical layers (`Model`, `Control`, `View`) are universal, while horizontal feature slices (`*.cli`, `*.gui`, etc.) partition orthogonal presentation and execution channels cleanly.
+
 Every system following FastArchitecture is partitioned into three strictly segregated vertical layers, which can be cleanly sub-divided into horizontal feature slices:
 
 ```text
-FastArchitecture
+FastArchitecture (Generic Topology Example)
      │
      ├── Model    (state, domain data, service backends)
-     │    ├── tts/
-     │    ├── daemon/
-     │    └── settings/
+     │    ├── core/        # Pure domain models & immutable records
+     │    ├── service/     # Data & background service providers
+     │    └── settings/    # Application configuration & preferences
      │
      ├── Control  (behavior, user inputs, orchestration)
-     │    ├── cli/
-     │    └── gui/
+     │    ├── cli/         # Command-line dispatchers & action handlers
+     │    └── gui/         # Graphical interaction & window controllers
      │
      └── View     (presentation, rendering, user feedback)
-          ├── cli/
-          └── gui/
+          ├── cli/         # Terminal renderers, prompts & ANSI formatters
+          └── gui/         # UI components, canvas & window widgets
 
 Allowed:
   Control.* -> Model.*.read
